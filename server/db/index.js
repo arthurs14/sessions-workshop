@@ -3,8 +3,14 @@ const db = require('./db.js');
 
 const syncAndSeed = () => db
   .sync({ force: true })
-  .then(() => {
-    // TODO: Seed...
+  .then(async () => {
+    const users = [
+      { name: 'moe', password: 'MOE' },
+      { name: 'curly', password: 'CURLY' }
+    ];
+
+    await users.map(user => User.create(user));
+    
     return true;
   })
   .catch(e => {
