@@ -1,7 +1,11 @@
 const path = require('path');
 const express = require('express');
+const expressSession = require('express-session');
 const chalk = require('chalk');
 const { syncAndSeed } = require('./db/index.js');
+const db = require('./db/index');
+const { User } = db.models;
+
 
 const PORT = 3000;
 
@@ -17,6 +21,14 @@ process.on('uncaughtException', (e) => {
 
 const app = express();
 
+app.use(expressSession(
+  {
+    saveUninitialized: true,
+    resave: false,
+    secret: 'the secret',
+  })
+);
+
 const STATIC_DIR = path.join(__dirname, '../static');
 
 app.use(express.json());
@@ -31,9 +43,17 @@ app.use((req, res, next) => {
 app.post('/api/login', (req, res, next) => {
   const { username, password } = req.body;
 
-
+  User.findOne({ where: { name: username, password: password } })
+    .then( user => {
+      if(!user) {
+        throw { status: 401, message: 'You are unauthorized' };
+      }
+      req.session.user = user;
+      return res.send(user);
+    })
+    .catch(err => next(err));
   // TODO: This obviously isn't all we should do...
-  res.status(200).send({ something: 'probably user related?' });
+  // res.status(200).send({ something: 'logged in?' });
   // You can toggle this to see how the app behaves if an error goes down...
   // res.status(401).send({ message: 'You are unauthorized!' });
 });

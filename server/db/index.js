@@ -9,9 +9,12 @@ const syncAndSeed = () => db
       { name: 'curly', password: 'CURLY' }
     ];
 
-    await users.map(user => User.create(user));
-    
-    return true;
+    const [moe, curly] = await users.map(user => User.create(user));
+
+    return {
+      moe,
+      curly
+    };
   })
   .catch(e => {
     console.error(e);
