@@ -60,11 +60,18 @@ app.post('/api/login', (req, res, next) => {
 
 app.get('/api/logout', (req, res, next) => {
   // TODO: Build this functionality.
+  req.session.destroy();
+  res.status(204).send('user is now logged out');
   next();
 });
 
 app.get('/api/session', (req, res, next) => {
   // TODO: Build this functionality.
+  const user = req.session.user;
+  if(user) {
+    return res.send(user);
+  }
+  next({ status: 401, message: 'user is not logged in' });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(STATIC_DIR, './index.html')));
