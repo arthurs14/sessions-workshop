@@ -49,6 +49,7 @@ app.post('/api/login', (req, res, next) => {
         throw { status: 401, message: 'You are unauthorized' };
       }
       req.session.user = user;
+      console.log('user', user)
       return res.send(user);
     })
     .catch(err => next(err));
@@ -72,6 +73,14 @@ app.get('/api/session', (req, res, next) => {
     return res.send(user);
   }
   next({ status: 401, message: 'user is not logged in' });
+});
+
+app.get('/user', (req, res, next)=> {
+  if(req.session.user){
+    next()
+  }else {
+    res.redirect('/')
+  }
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(STATIC_DIR, './index.html')));
